@@ -60,7 +60,7 @@ class ParseGb:
                 'url': soup.find('div', attrs={'itemprop': 'image'}).text
             },
             'comments': [{
-                'author': comment.get
+                # 'author': comment.get('')
                 'text': comment.text
             } for comment in self._get_comments(post_id, self.comments_url)]
         }
@@ -102,6 +102,7 @@ class ParseGb:
         }
         response = self._get_response(url, headers=self.headers, params=params)
         data = response.json()
+        # if
         return data
 
 
