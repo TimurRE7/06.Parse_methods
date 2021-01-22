@@ -5,17 +5,21 @@ from urllib.parse import urljoin
 from dotenv import load_dotenv
 from dateutil import parser as dtparser
 
-
 from database import Database
 
 
 class ParseGb:
-    def __init__(self, start_url, database):
+    headers = {
+        'User-Agent': "Mozilla/5.0 (Windows NT 10.0; Win64; x64; rv:84.0) Gecko/20100101 Firefox/84.0"
+    }
+
+    def __init__(self, start_url, database, comments_url):
         self.start_url = start_url
         self.done_urls = set()
         self.tasks = [self.parse_task(self.start_url, self.pag_parse)]
         self.done_urls.add(self.start_url)
         self.database = database
+        self.comments_url = comments_url
 
     def _get_soup(self, *args, **kwargs):
         response = requests.get(*args, **kwargs)
@@ -37,6 +41,7 @@ class ParseGb:
 
     def post_parse(self, url, soup: bs4.BeautifulSoup):
         author_name_tag = soup.find('div', attrs={'itemprop': 'author'})
+        post_id = soup.find('comments', attrs={'commentable-type': 'Post'}).get('commentable-id')
         data = {
             'post_data': {
                 'url': url,
@@ -54,6 +59,10 @@ class ParseGb:
             'image': {
                 'url': soup.find('div', attrs={'itemprop': 'image'}).text
             },
+            'comments': [{
+                'author': comment.get
+                'text': comment.text
+            } for comment in self._get_comments(post_id, self.comments_url)]
         }
         return data
 
@@ -75,8 +84,29 @@ class ParseGb:
                 self.tasks.append(task)
                 self.done_urls.add(post_href)
 
+    def _get_response(self, url, **kwargs):
+        while True:
+            try:
+                response = requests.get(url, **kwargs)
+                if response.status_code != 200:
+                    raise StatusCodeError(f'status {response.status_code}')
+                return response
+            except (requests.exceptions.ConnectTimeout,
+                    StatusCodeError):
+                time.sleep(0.2)
+
+    def _get_comments(self, post_id, url):
+        params = {
+            'commentable_type': 'Post',
+            'commentable_id': post_id
+        }
+        response = self._get_response(url, headers=self.headers, params=params)
+        data = response.json()
+        return data
+
 
 if __name__ == '__main__':
     load_dotenv('.env')
-    parser = ParseGb('https://geekbrains.ru/posts', Database(os.getenv('SQL_DB')))
+    parser = ParseGb('https://geekbrains.ru/posts', Database(os.getenv('SQL_DB')),
+                     'https://geekbrains.ru/api/v2/comments')
     parser.run()
