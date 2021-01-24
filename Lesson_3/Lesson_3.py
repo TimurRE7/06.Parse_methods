@@ -21,7 +21,8 @@ class ParseGb:
         self.database = database
         self.comments_url = comments_url
 
-    def _get_soup(self, *args, **kwargs):
+    @staticmethod
+    def _get_soup(*args, **kwargs):
         response = requests.get(*args, **kwargs)
         soup = bs4.BeautifulSoup(response.text, 'lxml')
         return soup
@@ -30,7 +31,6 @@ class ParseGb:
         def wrap():
             soup = self._get_soup(url)
             return callback(url, soup)
-
         return wrap
 
     def run(self):
@@ -59,10 +59,7 @@ class ParseGb:
             'image': {
                 'url': soup.find('div', attrs={'itemprop': 'image'}).text
             },
-            'comments': [{
-                # 'author': comment.get('')
-                'text': comment.text
-            } for comment in self._get_comments(post_id, self.comments_url)]
+            'comments': self._get_comments_list(post_id, self.comments_url)
         }
         return data
 
@@ -84,26 +81,30 @@ class ParseGb:
                 self.tasks.append(task)
                 self.done_urls.add(post_href)
 
-    def _get_response(self, url, **kwargs):
-        while True:
-            try:
-                response = requests.get(url, **kwargs)
-                if response.status_code != 200:
-                    raise StatusCodeError(f'status {response.status_code}')
-                return response
-            except (requests.exceptions.ConnectTimeout,
-                    StatusCodeError):
-                time.sleep(0.2)
-
-    def _get_comments(self, post_id, url):
+    def _get_comments_list(self, post_id, url):
         params = {
             'commentable_type': 'Post',
             'commentable_id': post_id
         }
-        response = self._get_response(url, headers=self.headers, params=params)
-        data = response.json()
-        # if
+        response = requests.get(url, headers=self.headers, params=params)
+        data = self._get_comment(response.json())
         return data
+
+    def _get_comment(self, data):
+        comments = []
+        comment_dict = {}
+        for comment in data:
+            comment_dict['url'] = comment.get('comment').get('user').get('url')
+            comment_dict['name'] = comment.get('comment').get('user').get('full_name')
+            comment_dict['text'] = comment.get('comment').get('body')
+            comment_dict['comment_id'] = comment.get('comment').get('id')
+            comment_dict['parent_id'] = comment.get('comment').get('parent_id')
+
+            comments.append(comment_dict.copy())
+            children_comments = comment.get('comment').get('children')
+            if children_comments:
+                comments += (self._get_comment(children_comments))
+        return comments
 
 
 if __name__ == '__main__':

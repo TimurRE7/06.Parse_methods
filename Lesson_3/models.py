@@ -27,6 +27,7 @@ class Post(Base, MixIdUrl):
     image_id = Column(Integer, ForeignKey('images.id'))
     image = relationship('Images')
     date = Column(DateTime)
+    comments = relationship('Comments')
 
 
 class Author(Base, MixIdUrl):
@@ -43,5 +44,15 @@ class Tag(Base, MixIdUrl):
 
 class Images(Base, MixIdUrl):
     __tablename__ = 'images'
+    # post_id = Column(Integer, ForeignKey('post.id'))
+
+
+class Comments(Base):
+    __tablename__ = 'comments'
     id = Column(Integer, primary_key=True, autoincrement=True)
-    url = Column(String, nullable=False, unique=True)
+    text = Column(String, nullable=False)
+    author_id = Column(Integer, ForeignKey('author.id'))
+    author = relationship('Author')
+    post_id = Column(Integer, ForeignKey('post.id'))
+    post = relationship('Post')
+    url = Column(String, nullable=False)

@@ -15,15 +15,25 @@ class Database:
             db_model = model(**data)
         return db_model
 
+    def get_or_create_comment(self, session, model, data):
+        db_model = session.query(model).filter(model.url == data['url']).first()
+        if not db_model:
+            db_model = model(**data)
+        return db_model
+
     def create_post(self, data: dict):
         session = self.maker()
         tags = map(lambda tag_data: self.get_or_create(session, models.Tag, tag_data), data['tags'])
         author = self.get_or_create(session, models.Author, data['author'])
         post = self.get_or_create(session, models.Post, data['post_data'])
         image = self.get_or_create(session, models.Images, data['image'])
+        comments = map(
+            # lambda comment_data: self.get_or_create(session, models.Comments, comment_data), data['comments'])
+            lambda comment_data: session.query(models.Comments).first(), data['comments'])
         post.author = author
         post.tags.extend(tags)
         post.image = image
+        post.comments.extend(comments)
 
         session.add(post)
 
