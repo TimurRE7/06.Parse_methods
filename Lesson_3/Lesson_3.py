@@ -95,7 +95,7 @@ class ParseGb:
         comment_dict = {}
         for comment in data:
             comment_dict['url'] = comment.get('comment').get('user').get('url')
-            comment_dict['name'] = comment.get('comment').get('user').get('full_name')
+            comment_dict['author'] = comment.get('comment').get('user').get('full_name')
             comment_dict['text'] = comment.get('comment').get('body')
             comment_dict['comment_id'] = comment.get('comment').get('id')
             comment_dict['parent_id'] = comment.get('comment').get('parent_id')

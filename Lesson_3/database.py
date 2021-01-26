@@ -16,7 +16,7 @@ class Database:
         return db_model
 
     def get_or_create_comment(self, session, model, data):
-        db_model = session.query(model).filter(model.url == data['url']).first()
+        db_model = session.query(model).filter(model.comment_id == data['comment_id']).first()
         if not db_model:
             db_model = model(**data)
         return db_model
@@ -27,13 +27,14 @@ class Database:
         author = self.get_or_create(session, models.Author, data['author'])
         post = self.get_or_create(session, models.Post, data['post_data'])
         image = self.get_or_create(session, models.Images, data['image'])
-        comments = map(
-            # lambda comment_data: self.get_or_create(session, models.Comments, comment_data), data['comments'])
-            lambda comment_data: session.query(models.Comments).first(), data['comments'])
+        comment = map(
+            lambda comment_data: self.get_or_create_comment(session, models.Comments, comment_data), data['comments'])
         post.author = author
         post.tags.extend(tags)
         post.image = image
-        post.comments.extend(comments)
+        post.comments.extend(comment)
+
+
 
         session.add(post)
 

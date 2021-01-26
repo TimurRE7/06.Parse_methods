@@ -50,9 +50,11 @@ class Images(Base, MixIdUrl):
 class Comments(Base):
     __tablename__ = 'comments'
     id = Column(Integer, primary_key=True, autoincrement=True)
+    comment_id = Column(Integer, nullable=False)
     text = Column(String, nullable=False)
     author_id = Column(Integer, ForeignKey('author.id'))
     author = relationship('Author')
     post_id = Column(Integer, ForeignKey('post.id'))
     post = relationship('Post')
     url = Column(String, nullable=False)
+    parent_id = Column(Integer)
