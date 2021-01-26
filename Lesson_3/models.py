@@ -44,7 +44,6 @@ class Tag(Base, MixIdUrl):
 
 class Images(Base, MixIdUrl):
     __tablename__ = 'images'
-    # post_id = Column(Integer, ForeignKey('post.id'))
 
 
 class Comments(Base):
@@ -57,4 +56,5 @@ class Comments(Base):
     post_id = Column(Integer, ForeignKey('post.id'))
     post = relationship('Post')
     url = Column(String, nullable=False)
-    parent_id = Column(Integer)
+    parent_id = Column(Integer, ForeignKey('comments.comment_id'))
+    parent = relationship('Comments')

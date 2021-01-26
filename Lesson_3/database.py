@@ -34,8 +34,6 @@ class Database:
         post.image = image
         post.comments.extend(comment)
 
-
-
         session.add(post)
 
         try:
