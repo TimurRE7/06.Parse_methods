@@ -31,6 +31,7 @@ class ParseGb:
         def wrap():
             soup = self._get_soup(url)
             return callback(url, soup)
+
         return wrap
 
     def run(self):
@@ -94,12 +95,15 @@ class ParseGb:
         comments = []
         comment_dict = {}
         for comment in data:
-            comment_dict['url'] = comment.get('comment').get('user').get('url')
-            comment_dict['author'] = comment.get('comment').get('user').get('full_name')
+            comment_dict['author'] = {
+                'url': comment.get('comment').get('user').get('url'),
+                'name': comment.get('comment').get('user').get('full_name'),
+            }
+            # comment_dict['url'] = comment.get('comment').get('user').get('url')
+            # comment_dict['author_name'] = comment.get('comment').get('user').get('full_name')
             comment_dict['text'] = comment.get('comment').get('body')
             comment_dict['comment_id'] = comment.get('comment').get('id')
             comment_dict['parent_id'] = comment.get('comment').get('parent_id')
-
             comments.append(comment_dict.copy())
             children_comments = comment.get('comment').get('children')
             if children_comments:
