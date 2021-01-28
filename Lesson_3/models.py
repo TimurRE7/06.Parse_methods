@@ -28,7 +28,7 @@ class Post(Base, MixIdUrl):
     image = relationship('Images')
     date = Column(DateTime)
     comments = relationship('Comments')
-    comment_author = relationship('Author')
+    # comment_author = relationship('Author')
 
 
 class Author(Base, MixIdUrl):
@@ -52,11 +52,11 @@ class Comments(Base):
     id = Column(Integer, primary_key=True, autoincrement=True)
     comment_id = Column(Integer, nullable=False)
     text = Column(String, nullable=False)
-    author_id = Column(Integer, ForeignKey('author.id'))
-    author = relationship('Author')
-    # author_name = Column(String, nullable=False)
+    # author_id = Column(Integer, ForeignKey('author.id'))
+    # author = relationship('Author')
+    author_name = Column(String, nullable=False)
     post_id = Column(Integer, ForeignKey('post.id'))
     post = relationship('Post')
-    # url = Column(String, nullable=False)
+    url = Column(String, nullable=False)
     parent_id = Column(Integer, ForeignKey('comments.comment_id'))
     parent = relationship('Comments')
