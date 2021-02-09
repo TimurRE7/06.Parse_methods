@@ -1,6 +1,7 @@
 import scrapy
 import re
 import base64
+from ..loaders import AutoyoulaLoader
 
 
 class AutoyoulaSpider(scrapy.Spider):
@@ -26,20 +27,34 @@ class AutoyoulaSpider(scrapy.Spider):
     }
 
     data_query = {
-        'title': lambda resp: resp.css('div.AdvertCard_advertTitle__1S1Ak::text').get(),
-        'price': lambda resp: float(resp.css('div.AdvertCard_price__3dDCr::text').get().replace('\u2009', '')),
-        'img': lambda resp: list(
-            map(lambda img: img.attrib['src'],
-                resp.css(AutoyoulaSpider.css_query['images']))
-        ),
-        'specifications': lambda resp: dict(
-            map(lambda spec: (spec.css('div.AdvertSpecs_label__2JHnS::text').get(),
-                              spec.css('div.AdvertSpecs_data__xK2Qx ::text').get()),
-                resp.css('div.AdvertSpecs_row__ljPcX'))
-        ),
-        'description': lambda resp: resp.css('div.AdvertCard_descriptionInner__KnuRi ::text').get(),
-        'author_url': lambda resp: AutoyoulaSpider.author_parse(resp),
-        'phone': lambda resp: AutoyoulaSpider.phone_parse(resp),
+        # 'title': lambda resp: resp.css('div.AdvertCard_advertTitle__1S1Ak::text').get(),
+        # 'price': lambda resp: float(resp.css('div.AdvertCard_price__3dDCr::text').get().replace('\u2009', '')),
+        # 'img': lambda resp: list(
+        #     map(lambda img: img.attrib['src'],
+        #         resp.css(AutoyoulaSpider.css_query['images']))
+        # ),
+        # 'specifications': lambda resp: dict(
+        #     map(lambda spec: (spec.css('div.AdvertSpecs_label__2JHnS::text').get(),
+        #                       spec.css('div.AdvertSpecs_data__xK2Qx ::text').get()),
+        #         resp.css('div.AdvertSpecs_row__ljPcX'))
+        # ),
+        # 'description': lambda resp: resp.css('div.AdvertCard_descriptionInner__KnuRi ::text').get(),
+        # 'author_url': lambda resp: AutoyoulaSpider.author_parse(resp),
+        # 'phone': lambda resp: AutoyoulaSpider.phone_parse(resp),
+        'title': 'div.AdvertCard_advertTitle__1S1Ak::text',
+        'price': 'div.AdvertCard_price__3dDCr::text',
+        # 'img': lambda resp: list(
+        #     map(lambda img: img.attrib['src'],
+        #         resp.css(AutoyoulaSpider.css_query['images']))
+        # ),
+        # 'specifications': lambda resp: dict(
+        #     map(lambda spec: (spec.css('div.AdvertSpecs_label__2JHnS::text').get(),
+        #                       spec.css('div.AdvertSpecs_data__xK2Qx ::text').get()),
+        #         resp.css('div.AdvertSpecs_row__ljPcX'))
+        # ),
+        # 'description': lambda resp: resp.css('div.AdvertCard_descriptionInner__KnuRi ::text').get(),
+        # 'author_url': lambda resp: AutoyoulaSpider.author_parse(resp),
+        # 'phone': lambda resp: AutoyoulaSpider.phone_parse(resp),
     }
 
     def parse(self, response, **kwargs):
@@ -53,14 +68,21 @@ class AutoyoulaSpider(scrapy.Spider):
         yield from self.gen_task(response, ads_links, self.ads_parse)
 
     def ads_parse(self, response):
-        data = {}
+        loader = AutoyoulaLoader(response=response)
+        loader.add_value('url', response.url)
         for key, selector in self.data_query.items():
-            try:
-                data[key] = selector(response)
-            except (ValueError, AttributeError):
-                continue
-        if list(data.values())[0]:
-            return data
+            loader.add_css(key, selector)
+
+        item = loader.load_item()
+        yield item
+
+        #
+        #     try:
+        #         data[key] = selector(response)
+        #     except (ValueError, AttributeError):
+        #         continue
+        # if list(data.values())[0]:
+        #     return data
 
     @staticmethod
     def gen_task(response, link_list, callback):
