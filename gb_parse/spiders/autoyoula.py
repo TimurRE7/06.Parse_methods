@@ -26,21 +26,12 @@ class AutoyoulaSpider(scrapy.Spider):
         'description': 'div.AdvertCard_descriptionInner__KnuRi',
     }
 
+    xpath_query = {
+        'brands': "//div[@class='TransportMainFilters_brandsList__2tIkv']//a[@data-target='brand']/@href"
+        'pagination': "//div[@class=]"
+    }
+
     data_query = {
-        # 'title': lambda resp: resp.css('div.AdvertCard_advertTitle__1S1Ak::text').get(),
-        # 'price': lambda resp: float(resp.css('div.AdvertCard_price__3dDCr::text').get().replace('\u2009', '')),
-        # 'img': lambda resp: list(
-        #     map(lambda img: img.attrib['src'],
-        #         resp.css(AutoyoulaSpider.css_query['images']))
-        # ),
-        # 'specifications': lambda resp: dict(
-        #     map(lambda spec: (spec.css('div.AdvertSpecs_label__2JHnS::text').get(),
-        #                       spec.css('div.AdvertSpecs_data__xK2Qx ::text').get()),
-        #         resp.css('div.AdvertSpecs_row__ljPcX'))
-        # ),
-        # 'description': lambda resp: resp.css('div.AdvertCard_descriptionInner__KnuRi ::text').get(),
-        # 'author_url': lambda resp: AutoyoulaSpider.author_parse(resp),
-        # 'phone': lambda resp: AutoyoulaSpider.phone_parse(resp),
         'title': 'div.AdvertCard_advertTitle__1S1Ak::text',
         'price': 'div.AdvertCard_price__3dDCr::text',
         # 'img': lambda resp: list(
@@ -57,8 +48,12 @@ class AutoyoulaSpider(scrapy.Spider):
         # 'phone': lambda resp: AutoyoulaSpider.phone_parse(resp),
     }
 
+    x_path = {
+
+    }
+
     def parse(self, response, **kwargs):
-        brands_links = response.css(self.css_query['brands'])
+        brands_links = response.css(self.xpath_query['brands'])
         yield from self.gen_task(response, brands_links, self.brand_parse)
 
     def brand_parse(self, response):
@@ -87,7 +82,7 @@ class AutoyoulaSpider(scrapy.Spider):
     @staticmethod
     def gen_task(response, link_list, callback):
         for link in link_list:
-            yield response.follow(link.attrib['href'], callback=callback)
+            yield response.follow(link, callback=callback)
 
     @staticmethod
     def author_parse(response):
