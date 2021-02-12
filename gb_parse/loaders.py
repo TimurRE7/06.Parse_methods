@@ -3,7 +3,9 @@ from urllib.parse import urljoin
 from scrapy import Selector
 from scrapy.loader import ItemLoader
 from itemloaders.processors import TakeFirst, MapCompose
-from .items import AutoyoulaItem, HHVacancyItem
+# from .items import AutoyoulaItem
+# from .items import HHVacancyItem
+from .items import HHVacancyItem
 
 
 # def clear_price(item: str):
