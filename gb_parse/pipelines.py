@@ -24,7 +24,7 @@ class MongoSavePipeline:
 
     def process_item(self, item, spider):
         db = self.db_client['hhru']
-        collection = db[spider.name]
+        collection = db[type(item).__name__]
         collection.insert_one(item)
         return item
 
