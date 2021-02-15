@@ -24,18 +24,18 @@ import scrapy
 #     test = scrapy.Field()
 
 
-# class HHVacancyItem(scrapy.Item):
-#     _id = scrapy.Field()
-#     url = scrapy.Field()
-#     title = scrapy.Field()
-#     salary = scrapy.Field()
-#     description = scrapy.Field()
-#     skills = scrapy.Field()
-#     company_url = scrapy.Field()
-#     company_name = scrapy.Field()
-#     company_site = scrapy.Field()
-#     company_sphere = scrapy.Field()
-#     company_description = scrapy.Field()
+class HHVacancyItem(scrapy.Item):
+    _id = scrapy.Field()
+    url = scrapy.Field()
+    title = scrapy.Field()
+    salary = scrapy.Field()
+    description = scrapy.Field()
+    skills = scrapy.Field()
+    company_url = scrapy.Field()
+    company_name = scrapy.Field()
+    company_site = scrapy.Field()
+    company_sphere = scrapy.Field()
+    company_description = scrapy.Field()
 
 
 class Inst(scrapy.Item):
@@ -51,16 +51,3 @@ class InstTag(Inst):
 
 class InstPost(Inst):
     pass
-
-
-class InstUser(Inst):
-    pass
-
-
-class InstFollow(scrapy.Item):
-    _id = scrapy.Field()
-    date_parse = scrapy.Field()
-    user_name = scrapy.Field()
-    user_id = scrapy.Field()
-    follow_name = scrapy.Field()
-    follow_id = scrapy.Field()

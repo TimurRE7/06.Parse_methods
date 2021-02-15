@@ -67,8 +67,8 @@ DEFAULT_REQUEST_HEADERS = {
 # See https://docs.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     # 'gb_parse.pipelines.GbParsePipeline': 300,
+    'gb_parse.pipelines.GbImagePipeline': 200,
     'gb_parse.pipelines.MongoSavePipeline': 400,
-    'gb_parse.pipelines.GbImagePipeline': 300,
 
 }
 

@@ -23,7 +23,7 @@ class MongoSavePipeline:
         self.db_client = pymongo.MongoClient(os.getenv('DATA_BASE'))
 
     def process_item(self, item, spider):
-        db = self.db_client['hhru']
+        db = self.db_client['instagram']
         collection = db[type(item).__name__]
         collection.insert_one(item)
         return item
@@ -31,10 +31,15 @@ class MongoSavePipeline:
 
 class GbImagePipeline(ImagesPipeline):
     def get_media_requests(self, item, info):
-        for img_url in item.get('images', []):
-            yield Request(img_url)
+        try:
+            img_url = item['data']['display_url']
+        except KeyError:
+            img_url = item['data']['profile_pic_url']
+        except:
+            img_url = []
+        yield Request(img_url)
 
     def item_completed(self, results, item, info):
         print(1)
-        item['images'] = [itm[1] for itm in results]
+        item['data']['display_url'] = [itm[1] for itm in results]
         return item

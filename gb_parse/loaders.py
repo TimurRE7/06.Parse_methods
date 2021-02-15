@@ -4,8 +4,7 @@ from scrapy import Selector
 from scrapy.loader import ItemLoader
 from itemloaders.processors import TakeFirst, MapCompose
 # from .items import AutoyoulaItem
-# from .items import HHVacancyItem
-from .items import InstTag, InstPost, InstFollow
+from .items import HHVacancyItem
 
 
 # def clear_price(item: str):
@@ -61,21 +60,6 @@ def clear_data(data):
 
 def get_sphere(data: str):
     return data.title().split(', ')
-
-
-# class HHVacancyLoader(ItemLoader):
-#     default_item_class = HHVacancyItem
-#     title_out = TakeFirst()
-#     url_out = TakeFirst()
-#     description_in = ''.join
-#     description_out = TakeFirst()
-#     salary_in = ''.join
-#     salary_out = MapCompose(clear_data)
-#     company_sphere_out = MapCompose(get_sphere)
-#     company_description_in = ''.join
-#     company_description_out = MapCompose(clear_data)
-#     company_name_in = ' '.join
-#     company_name_out = MapCompose(clear_data)
 
 
 class HHVacancyLoader(ItemLoader):
