@@ -42,7 +42,7 @@ class Inst(scrapy.Item):
     _id = scrapy.Field()
     date_parse = scrapy.Field()
     data = scrapy.Field()
-    img = scrapy.Field()
+    # img = scrapy.Field()
 
 
 class InstTag(Inst):
@@ -51,3 +51,25 @@ class InstTag(Inst):
 
 class InstPost(Inst):
     pass
+
+
+class InstUser(Inst):
+    pass
+
+
+class InstFollow(scrapy.Item):
+    _id = scrapy.Field()
+    date_parse = scrapy.Field()
+    user_name = scrapy.Field()
+    user_id = scrapy.Field()
+    follow_name = scrapy.Field()
+    follow_id = scrapy.Field()
+
+
+class InstFollowers(scrapy.Item):
+    _id = scrapy.Field()
+    date_parse = scrapy.Field()
+    user_name = scrapy.Field()
+    user_id = scrapy.Field()
+    follower_name = scrapy.Field()
+    follower_id = scrapy.Field()
